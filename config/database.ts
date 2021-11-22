@@ -37,7 +37,7 @@ const databaseConfig: DatabaseConfig = {
     sqlite: {
       client: 'sqlite',
       connection: {
-        filename: Application.tmpPath('db.sqlite3'),
+        filename: Application.tmpPath(Env.get('SQLITE_FILENAME')),
       },
       migrations: {
         naturalSort: true,
