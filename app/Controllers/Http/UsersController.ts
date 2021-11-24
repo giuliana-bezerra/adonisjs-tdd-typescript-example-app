@@ -1,3 +1,4 @@
+import { AuthContract } from '@ioc:Adonis/Addons/Auth'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import CreateUserValidator from 'App/Validators/CreateUserValidator'
@@ -13,15 +14,12 @@ export default class UsersController {
       expiresIn: '2hours',
     })
 
-    return response.ok({
-      user: {
-        email: auth.user!.email,
-        token: token.token,
-        username: auth.user!.username,
-        bio: auth.user!.bio,
-        image: auth.user!.image,
-      },
-    })
+    return response.ok(this.getUser(auth, token.token))
+  }
+
+  public async me({ response, auth }: HttpContextContract) {
+    const token = (await auth.use('api').generate(auth.user!)).token
+    return response.ok(this.getUser(auth, token))
   }
 
   public async store({ request, response, auth }: HttpContextContract) {
@@ -33,14 +31,18 @@ export default class UsersController {
       expiresIn: '2hours',
     })
 
-    return response.created({
+    return response.created(this.getUser(auth, token.token))
+  }
+
+  private getUser(auth: AuthContract, token: string) {
+    return {
       user: {
         email: auth.user!.email,
-        token: token.token,
+        token: token,
         username: auth.user!.username,
         bio: auth.user!.bio,
         image: auth.user!.image,
       },
-    })
+    }
   }
 }
