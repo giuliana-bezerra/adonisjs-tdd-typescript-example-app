@@ -28,4 +28,9 @@ Route.group(() => {
   Route.get('/user', 'UsersController.me').middleware('auth')
   Route.post('/users/login', 'UsersController.login')
   Route.post('/users', 'UsersController.store')
+  Route.put('/user', 'UsersController.update').middleware('auth')
+
+  Route.get('/profiles/:username', 'ProfilesController.show').middleware('silentAuth')
+  Route.post('/profiles/:username/follow', 'ProfilesController.follow').middleware('auth')
+  Route.delete('/profiles/:username/follow', 'ProfilesController.unfollow').middleware('auth')
 }).prefix('/api')

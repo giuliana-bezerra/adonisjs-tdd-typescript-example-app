@@ -1,8 +1,8 @@
-import { AuthContract } from '@ioc:Adonis/Addons/Auth'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import CreateUserValidator from 'App/Validators/CreateUserValidator'
 import LoginValidator from 'App/Validators/LoginValidator'
+import UpdateUserValidator from 'App/Validators/UpdateUserValidator'
 
 export default class UsersController {
   public async login({ request, response, auth }: HttpContextContract) {
@@ -14,12 +14,14 @@ export default class UsersController {
       expiresIn: '2hours',
     })
 
-    return response.ok(this.getUser(auth, token.token))
+    return response.ok(this.getUser(auth.user!, token.token))
   }
 
   public async me({ response, auth }: HttpContextContract) {
+    // Generating a new token
     const token = (await auth.use('api').generate(auth.user!)).token
-    return response.ok(this.getUser(auth, token))
+
+    return response.ok(this.getUser(auth.user!, token))
   }
 
   public async store({ request, response, auth }: HttpContextContract) {
@@ -31,17 +33,28 @@ export default class UsersController {
       expiresIn: '2hours',
     })
 
-    return response.created(this.getUser(auth, token.token))
+    return response.created(this.getUser(auth.user!, token.token))
   }
 
-  private getUser(auth: AuthContract, token: string) {
+  public async update({ request, response, auth }: HttpContextContract) {
+    const { user: userPayload } = await request.validate(UpdateUserValidator)
+    let user = auth.user!
+    user.merge(userPayload)
+    await user.save()
+
+    // Getting existing token from authorization header
+    const token = request.headers().authorization!.replace('Bearer ', '')
+    return response.ok(this.getUser(user, token))
+  }
+
+  private getUser(user: User, token: string) {
     return {
       user: {
-        email: auth.user!.email,
+        email: user.email,
         token: token,
-        username: auth.user!.username,
-        bio: auth.user!.bio,
-        image: auth.user!.image,
+        username: user.username,
+        bio: user.bio,
+        image: user.image,
       },
     }
   }

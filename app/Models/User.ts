@@ -1,5 +1,5 @@
 import Hash from '@ioc:Adonis/Core/Hash'
-import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeSave, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import { DateTime } from 'luxon'
 
 export default class User extends BaseModel {
@@ -23,6 +23,22 @@ export default class User extends BaseModel {
 
   @column({ serializeAs: null })
   public rememberMeToken?: string
+
+  @manyToMany(() => User, {
+    serializeAs: null,
+    pivotTable: 'follows',
+    pivotForeignKey: 'follower',
+    pivotRelatedForeignKey: 'following',
+  })
+  public followings: ManyToMany<typeof User>
+
+  @manyToMany(() => User, {
+    serializeAs: null,
+    pivotTable: 'follows',
+    pivotForeignKey: 'following',
+    pivotRelatedForeignKey: 'follower',
+  })
+  public followers: ManyToMany<typeof User>
 
   @column.dateTime({ autoCreate: true, serializeAs: null })
   public createdAt: DateTime
