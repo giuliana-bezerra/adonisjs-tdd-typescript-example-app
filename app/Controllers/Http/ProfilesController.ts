@@ -39,10 +39,12 @@ export default class ProfilesController {
 
   public getProfile(user: User) {
     return {
-      username: user.username,
-      bio: user.bio,
-      image: user.image,
-      following: !!user.followers?.length,
+      profile: {
+        username: user.username,
+        bio: user.bio,
+        image: user.image,
+        following: !!user.followers?.length,
+      },
     }
   }
 }
