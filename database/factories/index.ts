@@ -2,6 +2,7 @@ import Factory from '@ioc:Adonis/Lucid/Factory'
 import Article from 'App/Models/Article'
 import Tag from 'App/Models/Tag'
 import User from 'App/Models/User'
+import Favorites from 'Database/migrations/1647805071327_favorites'
 
 export const UserFactory = Factory.define(User, ({ faker }) => {
   return {

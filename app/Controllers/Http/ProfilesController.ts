@@ -1,5 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
+import { getProfile } from '../Mappers/ProfileMapper'
 
 export default class ProfilesController {
   public async show({ request, response, auth }: HttpContextContract) {
@@ -13,7 +14,7 @@ export default class ProfilesController {
       .where('username', username)
       .firstOrFail()
 
-    return response.ok(this.getProfile(profile))
+    return response.ok(getProfile(profile))
   }
 
   public async follow({ request, response, auth }: HttpContextContract) {
@@ -25,7 +26,7 @@ export default class ProfilesController {
     await profile.load('followers', (query) => {
       query.where('follower', follower)
     })
-    return response.ok(this.getProfile(profile))
+    return response.ok(getProfile(profile))
   }
 
   public async unfollow({ request, response, auth }: HttpContextContract) {
@@ -34,17 +35,6 @@ export default class ProfilesController {
 
     const profile = await User.findByOrFail('username', username)
     await profile.related('followers').detach([follower])
-    return response.ok(this.getProfile(profile))
-  }
-
-  private getProfile(user: User) {
-    return {
-      profile: {
-        username: user.username,
-        bio: user.bio,
-        image: user.image,
-        following: !!user.followers?.length,
-      },
-    }
+    return response.ok(getProfile(profile))
   }
 }
