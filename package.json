@@ -33,6 +33,7 @@
     "@adonisjs/auth": "^8.0.10",
     "@adonisjs/core": "^5.3.0",
     "@adonisjs/lucid": "^16.3.2",
+    "@adonisjs/lucid-slugify": "^2.1.4",
     "@adonisjs/repl": "^3.1.0",
     "luxon": "^2.1.1",
     "phc-argon2": "^1.1.2",

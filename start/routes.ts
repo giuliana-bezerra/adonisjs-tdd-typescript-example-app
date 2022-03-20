@@ -33,4 +33,6 @@ Route.group(() => {
   Route.get('/profiles/:username', 'ProfilesController.show').middleware('silentAuth')
   Route.post('/profiles/:username/follow', 'ProfilesController.follow').middleware('auth')
   Route.delete('/profiles/:username/follow', 'ProfilesController.unfollow').middleware('auth')
+
+  Route.post('/articles', 'ArticlesController.store').middleware('auth')
 }).prefix('/api')
