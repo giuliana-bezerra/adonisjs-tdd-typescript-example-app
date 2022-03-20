@@ -2,28 +2,30 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Article from 'App/Models/Article'
 import Tag from 'App/Models/Tag'
 import User from 'App/Models/User'
+import CreateArticleValidator from 'App/Validators/CreateArticleValidator'
 
 export default class ArticlesController {
   public async store({ request, response, auth }: HttpContextContract) {
     const user = auth.user!
-    let articlePayload = request.only(['title', 'description', 'body'])
-    articlePayload['authorId'] = user.id
-    const tagListPayload = request.input('tagList')
+    const { article: articlePayload } = await request.validate(CreateArticleValidator)
+    const tagListPayload = articlePayload.tagList
 
-    const article = await Article.create(articlePayload)
+    const article = await Article.create({ ...articlePayload, authorId: user.id })
     await this.createTagsForArticle(article, tagListPayload)
 
     return response.created({ article: await this.getArticle(article, user) })
   }
 
-  public async createTagsForArticle(article: Article, tagListPayload: string[]) {
-    const tagList = tagListPayload.map((tag: string) => {
-      return {
-        name: tag,
-      }
-    })
-    await Tag.fetchOrCreateMany('name', tagList)
-    await article.related('tagList').attach(tagListPayload)
+  public async createTagsForArticle(article: Article, tagListPayload: string[] | undefined) {
+    if (!!tagListPayload) {
+      const tagList = tagListPayload.map((tag: string) => {
+        return {
+          name: tag,
+        }
+      })
+      await Tag.fetchOrCreateMany('name', tagList)
+      await article.related('tagList').attach(tagListPayload)
+    }
   }
 
   private async getArticle(article: Article, user: User) {
