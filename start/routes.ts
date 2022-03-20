@@ -35,4 +35,6 @@ Route.group(() => {
   Route.delete('/profiles/:username/follow', 'ProfilesController.unfollow').middleware('auth')
 
   Route.post('/articles', 'ArticlesController.store').middleware('auth')
+
+  Route.get('/tags', 'TagsController.index')
 }).prefix('/api')

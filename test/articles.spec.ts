@@ -14,7 +14,7 @@ let user: {
 }
 
 test.group('Articles', (group) => {
-  test.only('it should create an article', async (assert) => {
+  test('it should create an article', async (assert) => {
     const { title, description, body } = await ArticleFactory.make()
     const article = { title, description, body, tagList: ['tag'] }
 

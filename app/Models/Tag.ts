@@ -4,6 +4,8 @@ import { DateTime } from 'luxon'
 import Article from './Article'
 
 export default class Tag extends BaseModel {
+  public static selfAssignPrimaryKey = true
+
   @column({ isPrimary: true })
   public name: string
 
