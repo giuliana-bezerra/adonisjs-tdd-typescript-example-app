@@ -144,7 +144,7 @@ test.group('Users', (group) => {
     assert.exists(body.user.token)
   })
 
-  test('should not update an user with invalid data', async () => {
+  test('it should not update an user with invalid data', async () => {
     const [email, password] = ['test@', 'test']
 
     await supertest(BASE_URL)

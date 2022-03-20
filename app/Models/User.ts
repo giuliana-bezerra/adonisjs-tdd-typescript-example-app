@@ -1,5 +1,6 @@
 import Hash from '@ioc:Adonis/Core/Hash'
 import { BaseModel, beforeSave, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
+import Article from 'App/Models/Article'
 import { DateTime } from 'luxon'
 
 export default class User extends BaseModel {
@@ -39,6 +40,11 @@ export default class User extends BaseModel {
     pivotRelatedForeignKey: 'follower',
   })
   public followers: ManyToMany<typeof User>
+
+  @manyToMany(() => Article, {
+    pivotTable: 'favorites',
+  })
+  public favorites: ManyToMany<typeof Article>
 
   @column.dateTime({ autoCreate: true, serializeAs: null })
   public createdAt: DateTime

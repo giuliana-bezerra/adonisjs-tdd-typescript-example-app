@@ -36,5 +36,7 @@ Route.group(() => {
 
   Route.post('/articles', 'ArticlesController.store').middleware('auth')
 
+  Route.post('/articles/:slug/favorite', 'FavoritesController.favorite').middleware('auth')
+
   Route.get('/tags', 'TagsController.index')
 }).prefix('/api')

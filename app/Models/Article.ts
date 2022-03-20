@@ -1,12 +1,5 @@
 import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
-import {
-  BaseModel,
-  belongsTo,
-  BelongsTo,
-  column,
-  manyToMany,
-  ManyToMany,
-} from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, belongsTo, BelongsTo, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import { DateTime } from 'luxon'
 
 import Tag from './Tag'
@@ -42,9 +35,14 @@ export default class Article extends BaseModel {
   public authorId: number
 
   @belongsTo(() => User, {
-    foreignKey: 'id',
+    foreignKey: 'authorId',
   })
   public author: BelongsTo<typeof User>
+
+  @manyToMany(() => User, {
+    pivotTable: 'favorites',
+  })
+  public favorites: ManyToMany<typeof User>
 
   @column.dateTime({ autoCreate: true, serializeAs: 'createdAt' })
   public createdAt: DateTime
