@@ -1,3 +1,4 @@
+import Database from '@ioc:Adonis/Lucid/Database'
 import User from 'App/Models/User'
 import { UserFactory } from 'Database/factories'
 import test from 'japa'
@@ -98,5 +99,13 @@ test.group('Profiles', (group) => {
     })
 
     user = body.user
+  })
+
+  group.beforeEach(async () => {
+    await Database.beginGlobalTransaction()
+  })
+
+  group.afterEach(async () => {
+    await Database.rollbackGlobalTransaction()
   })
 })
