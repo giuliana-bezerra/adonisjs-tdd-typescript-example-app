@@ -26,7 +26,7 @@ export default class ArticlesController {
     await article.related('tagList').attach(tagListPayload)
   }
 
-  public async getArticle(article: Article, user: User) {
+  private async getArticle(article: Article, user: User) {
     await article.load('author')
     await article.load('tagList')
     await article.author.load('followers', (query) => {

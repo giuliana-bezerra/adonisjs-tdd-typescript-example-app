@@ -8,7 +8,7 @@ export default class TagsController {
     return response.ok({ tags: this.getTags(tags) })
   }
 
-  public getTags(tags: Tag[]) {
+  private getTags(tags: Tag[]) {
     return tags.map((tag) => tag.name)
   }
 }

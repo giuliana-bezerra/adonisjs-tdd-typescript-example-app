@@ -37,7 +37,7 @@ export default class ProfilesController {
     return response.ok(this.getProfile(profile))
   }
 
-  public getProfile(user: User) {
+  private getProfile(user: User) {
     return {
       profile: {
         username: user.username,
