@@ -1,10 +1,9 @@
-import User from 'App/Models/User'
 import Database from '@ioc:Adonis/Lucid/Database'
 import { UserFactory } from 'Database/factories'
 import test from 'japa'
 import supertest from 'supertest'
-
 import { ArticleFactory } from './../database/factories/index'
+import { signIn } from './auth'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
 let user: {
@@ -43,13 +42,12 @@ test.group('Favorites', (group) => {
   })
 
   test('it should unfavorite an article', async (assert) => {
-    const article = await ArticleFactory.with('author').create()
-    const { id: userId } = await User.findByOrFail('username', user.username)
-    await article.related('favorites').attach([userId])
+    const article = await ArticleFactory.with('author').with('favorites').create()
+    const { token } = await signIn(article.favorites[0])
 
     const { body } = await supertest(BASE_URL)
       .delete(`/api/articles/${article.slug}/favorite`)
-      .set('Authorization', `Bearer ${user.token}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(200)
 
     assert.exists(body.article)
@@ -72,17 +70,8 @@ test.group('Favorites', (group) => {
   })
 
   group.before(async () => {
-    const password = '123456'
-    const { email } = await UserFactory.merge({ password }).create()
-
-    const { body } = await supertest(BASE_URL).post('/api/users/login').send({
-      user: {
-        email,
-        password,
-      },
-    })
-
-    user = body.user
+    const createdUser = await UserFactory.create()
+    user = await signIn(createdUser)
   })
 
   group.beforeEach(async () => {

@@ -12,7 +12,7 @@ let user: {
   image: string
 }
 
-test.group('Articles', (group) => {
+test.group('Create Articles', (group) => {
   test('it should create an article', async (assert) => {
     const { title, description, body } = await ArticleFactory.make()
     const article = { title, description, body, tagList: ['tag'] }

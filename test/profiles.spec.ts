@@ -3,6 +3,7 @@ import User from 'App/Models/User'
 import { UserFactory } from 'Database/factories'
 import test from 'japa'
 import supertest from 'supertest'
+import { signIn } from './auth'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
 let user: {
@@ -88,17 +89,8 @@ test.group('Profiles', (group) => {
   })
 
   group.before(async () => {
-    const password = '123456'
-    const { email } = await UserFactory.merge({ password }).create()
-
-    const { body } = await supertest(BASE_URL).post('/api/users/login').send({
-      user: {
-        email,
-        password,
-      },
-    })
-
-    user = body.user
+    const createdUser = await UserFactory.create()
+    user = await signIn(createdUser)
   })
 
   group.beforeEach(async () => {

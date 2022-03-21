@@ -11,7 +11,6 @@ export default class UsersSchema extends BaseSchema {
       table.string('password', 180).notNullable()
       table.string('bio', 255).nullable()
       table.string('image', 2048).nullable()
-      table.string('remember_me_token').nullable()
 
       /**
        * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL

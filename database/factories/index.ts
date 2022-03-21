@@ -2,13 +2,12 @@ import Factory from '@ioc:Adonis/Lucid/Factory'
 import Article from 'App/Models/Article'
 import Tag from 'App/Models/Tag'
 import User from 'App/Models/User'
-import Favorites from 'Database/migrations/1647805071327_favorites'
 
 export const UserFactory = Factory.define(User, ({ faker }) => {
   return {
     username: faker.internet.userName(),
     email: faker.internet.email(),
-    password: faker.internet.password(),
+    password: '123456',
     bio: faker.lorem.paragraph(),
     image: faker.image.imageUrl(),
   }
@@ -23,6 +22,7 @@ export const ArticleFactory = Factory.define(Article, ({ faker }) => {
 })
   .relation('tagList', () => TagsFactory)
   .relation('author', () => UserFactory)
+  .relation('favorites', () => UserFactory)
   .build()
 
 export const TagsFactory = Factory.define(Tag, ({ faker }) => {
