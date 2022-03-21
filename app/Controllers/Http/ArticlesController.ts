@@ -2,9 +2,14 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Article from 'App/Models/Article'
 import Tag from 'App/Models/Tag'
 import CreateArticleValidator from 'App/Validators/CreateArticleValidator'
-import { getArticle } from '../Mappers/ArticleMapper'
+import { getArticle, getArticles } from '../Mappers/ArticleMapper'
 
 export default class ArticlesController {
+  public async index({ request, response, auth }: HttpContextContract) {
+    const articles = await Article.query().orderBy('updatedAt', 'desc')
+    return response.ok({ articles: await getArticles(articles, auth.user) })
+  }
+
   public async store({ request, response, auth }: HttpContextContract) {
     const user = auth.user!
     const { article: articlePayload } = await request.validate(CreateArticleValidator)
@@ -16,7 +21,7 @@ export default class ArticlesController {
     return response.created({ article: await getArticle(article, user) })
   }
 
-  public async createTagsForArticle(article: Article, tagListPayload: string[] | undefined) {
+  private async createTagsForArticle(article: Article, tagListPayload: string[] | undefined) {
     if (!!tagListPayload) {
       const tagList = tagListPayload.map((tag: string) => {
         return {

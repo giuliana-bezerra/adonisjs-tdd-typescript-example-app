@@ -11,7 +11,9 @@ export const UserFactory = Factory.define(User, ({ faker }) => {
     bio: faker.lorem.paragraph(),
     image: faker.image.imageUrl(),
   }
-}).build()
+})
+  .relation('followers', () => UserFactory)
+  .build()
 
 export const ArticleFactory = Factory.define(Article, ({ faker }) => {
   return {

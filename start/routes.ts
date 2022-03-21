@@ -35,6 +35,7 @@ Route.group(() => {
   Route.delete('/profiles/:username/follow', 'ProfilesController.unfollow').middleware('auth')
 
   Route.post('/articles', 'ArticlesController.store').middleware('auth')
+  Route.get('/articles', 'ArticlesController.index').middleware('silentAuth')
 
   Route.post('/articles/:slug/favorite', 'FavoritesController.favorite').middleware('auth')
   Route.delete('/articles/:slug/favorite', 'FavoritesController.unfavorite').middleware('auth')
