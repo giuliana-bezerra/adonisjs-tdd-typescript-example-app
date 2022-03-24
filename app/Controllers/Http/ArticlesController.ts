@@ -2,11 +2,25 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Article from 'App/Models/Article'
 import Tag from 'App/Models/Tag'
 import CreateArticleValidator from 'App/Validators/CreateArticleValidator'
+
 import { getArticle, getArticles } from '../Mappers/ArticleMapper'
 
+const LIMIT = 20
 export default class ArticlesController {
   public async index({ request, response, auth }: HttpContextContract) {
-    const articles = await Article.query().orderBy('updatedAt', 'desc')
+    const { tag, author, favorited, limit, offset } = request.qs()
+
+    const articles = await Article.query()
+      .if(tag, (query) =>
+        query.whereHas('tagList', (query) => query.where('name', 'like', `%${tag}%`))
+      )
+      .if(author, (query) => query.whereHas('author', (query) => query.where('username', author)))
+      .if(favorited, (query) =>
+        query.whereHas('favorites', (query) => query.where('username', favorited))
+      )
+      .orderBy('updatedAt', 'desc')
+      .limit(limit || LIMIT)
+      .offset(offset || 0)
     return response.ok({ articles: await getArticles(articles, auth.user) })
   }
 
