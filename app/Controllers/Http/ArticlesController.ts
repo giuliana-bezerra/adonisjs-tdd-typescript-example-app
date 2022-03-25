@@ -7,6 +7,13 @@ import { getArticle, getArticles } from '../Mappers/ArticleMapper'
 
 const LIMIT = 20
 export default class ArticlesController {
+  public async show({ request, response, auth }: HttpContextContract) {
+    const slug = request.param('slug')
+    const article = await Article.findByOrFail('slug', slug)
+
+    return response.ok({ article: await getArticle(article, auth.user) })
+  }
+
   public async index({ request, response, auth }: HttpContextContract) {
     const { tag, author, favorited, limit, offset } = request.qs()
 

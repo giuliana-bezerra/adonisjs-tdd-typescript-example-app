@@ -6,13 +6,6 @@ import supertest from 'supertest'
 import { signIn } from '../auth'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
-let user: {
-  email: string
-  token: string
-  username: string
-  bio: string
-  image: string
-}
 
 test.group('List Articles', (group) => {
   test('it should list all articles', async (assert) => {
@@ -232,11 +225,6 @@ test.group('List Articles', (group) => {
     assert.equal(articles[0].author.following, false)
     assert.equal(articles[0].favorited, false)
     assert.equal(articles[0].favoritesCount, 0)
-  })
-
-  group.before(async () => {
-    const createdUser = await UserFactory.create()
-    user = await signIn(createdUser)
   })
 
   group.beforeEach(async () => {
