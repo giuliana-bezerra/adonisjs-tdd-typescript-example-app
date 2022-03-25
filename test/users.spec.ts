@@ -2,6 +2,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import { UserFactory } from 'Database/factories'
 import test from 'japa'
 import supertest from 'supertest'
+
 import { signIn } from './auth'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
@@ -145,10 +146,14 @@ test.group('Users', (group) => {
     assert.exists(body.user.token)
   })
 
-  test('it should not update an user with invalid data', async () => {
+  test('it should not update an user with invalid data', async (assert) => {
     const [email, password] = ['test@', 'test']
 
-    await supertest(BASE_URL)
+    const {
+      body: {
+        errors: { body },
+      },
+    } = await supertest(BASE_URL)
       .put('/api/user')
       .set('Authorization', `Bearer ${user.token}`)
       .send({
@@ -158,6 +163,9 @@ test.group('Users', (group) => {
         },
       })
       .expect(422)
+
+    assert.exists(body)
+    assert.lengthOf(body, 2)
   })
 
   group.beforeEach(async () => {

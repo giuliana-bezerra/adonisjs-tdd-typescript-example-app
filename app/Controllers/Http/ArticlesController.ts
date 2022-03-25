@@ -2,6 +2,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Article from 'App/Models/Article'
 import Tag from 'App/Models/Tag'
 import CreateArticleValidator from 'App/Validators/CreateArticleValidator'
+import UpdateArticleValidator from 'App/Validators/UpdateArticleValidator'
 
 import { getArticle, getArticles } from '../Mappers/ArticleMapper'
 
@@ -40,6 +41,18 @@ export default class ArticlesController {
     await this.createTagsForArticle(article, tagListPayload)
 
     return response.created({ article: await getArticle(article, user) })
+  }
+
+  public async update({ request, response, auth, bouncer }: HttpContextContract) {
+    const slug = request.param('slug')
+    const { article: articlePayload } = await request.validate(UpdateArticleValidator)
+
+    const article = await Article.findByOrFail('slug', slug)
+    await bouncer.authorize('updateArticle', article)
+
+    const articleUpdated = await article.merge(articlePayload).save()
+
+    return response.ok({ article: await getArticle(articleUpdated, auth.user) })
   }
 
   private async createTagsForArticle(article: Article, tagListPayload: string[] | undefined) {

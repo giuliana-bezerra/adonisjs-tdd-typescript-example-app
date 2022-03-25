@@ -1,12 +1,5 @@
 import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
-import {
-  BaseModel,
-  belongsTo,
-  BelongsTo,
-  column,
-  manyToMany,
-  ManyToMany,
-} from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, belongsTo, BelongsTo, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import { DateTime } from 'luxon'
 
 import Tag from './Tag'
@@ -23,6 +16,7 @@ export default class Article extends BaseModel {
   @slugify({
     strategy: 'simple',
     fields: ['title'],
+    allowUpdates: true,
   })
   public slug: string
 

@@ -7,15 +7,23 @@ import { signIn } from '../auth'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
 
-test.group('Get Article', (group) => {
-  test('it should get an article by its slug', async (assert) => {
-    const createdArticles = await ArticleFactory.with('author').with('tagList').createMany(5)
-    const createdArticle = createdArticles[0]
+test.group('Update Article', (group) => {
+  test('it should update an article', async (assert) => {
+    const createdArticle = await ArticleFactory.with('author').with('tagList').create()
+    const updatePayload = { title: 'title', description: 'description', body: 'body' }
     const tagList = createdArticle.tagList.map((tag) => tag.name)
+
+    const { token } = await signIn(createdArticle.author)
 
     const {
       body: { article },
-    } = await supertest(BASE_URL).get(`/api/articles/${createdArticle.slug}`).expect(200)
+    } = await supertest(BASE_URL)
+      .put(`/api/articles/${createdArticle.slug}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ article: updatePayload })
+      .expect(200)
+
+    await createdArticle.refresh()
 
     assert.exists(article)
     assert.equal(article.title, createdArticle.title)
@@ -30,28 +38,22 @@ test.group('Get Article', (group) => {
     assert.equal(article.favoritesCount, 0)
   })
 
-  test('it should return 404', async () => {
-    await supertest(BASE_URL).get('/api/users/slug').expect(404)
-  })
+  test('it should partially update an article', async (assert) => {
+    const createdArticle = await ArticleFactory.with('author').with('tagList').create()
+    const updatePayload = { title: 'title' }
+    const tagList = createdArticle.tagList.map((tag) => tag.name)
 
-  test('it should get an article with a follower', async (assert) => {
-    const author = await UserFactory.with('followers').create()
-    const createdArticle = await ArticleFactory.with('author', 1, (factory) => {
-      factory.merge({ ...author })
-    })
-      .with('tagList')
-      .create()
-
-    const { token } = await signIn(author.followers[0])
+    const { token } = await signIn(createdArticle.author)
 
     const {
       body: { article },
     } = await supertest(BASE_URL)
-      .get(`/api/articles/${createdArticle.slug}`)
+      .put(`/api/articles/${createdArticle.slug}`)
       .set('Authorization', `Bearer ${token}`)
+      .send({ article: updatePayload })
       .expect(200)
 
-    const tagList = createdArticle.tagList.map((tag) => tag.name)
+    await createdArticle.refresh()
 
     assert.exists(article)
     assert.equal(article.title, createdArticle.title)
@@ -61,32 +63,53 @@ test.group('Get Article', (group) => {
     assert.equal(article.author.username, createdArticle.author.username)
     assert.equal(article.author.bio, createdArticle.author.bio)
     assert.equal(article.author.image, createdArticle.author.image)
-    assert.equal(article.author.following, true)
+    assert.equal(article.author.following, false)
     assert.equal(article.favorited, false)
     assert.equal(article.favoritesCount, 0)
   })
 
-  test('it should get a favorited article', async (assert) => {
-    const createdArticle = await ArticleFactory.with('author').with('favorites').create()
-    const { token } = await signIn(createdArticle.favorites[0])
+  test('it should return 403 if user is not the author of the article', async () => {
+    const user = await UserFactory.create()
+    const createdArticle = await ArticleFactory.with('author').with('tagList').create()
+    const updatePayload = { title: 'title' }
+
+    const { token } = await signIn(user)
+
+    await supertest(BASE_URL)
+      .put(`/api/articles/${createdArticle.slug}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ article: updatePayload })
+      .expect(403)
+  })
+
+  test('it should update an article with empty payload', async (assert) => {
+    const createdArticle = await ArticleFactory.with('author').with('tagList').create()
+    const updatePayload = {}
+    const tagList = createdArticle.tagList.map((tag) => tag.name)
+
+    const { token } = await signIn(createdArticle.author)
 
     const {
       body: { article },
     } = await supertest(BASE_URL)
-      .get(`/api/articles/${createdArticle.slug}`)
+      .put(`/api/articles/${createdArticle.slug}`)
       .set('Authorization', `Bearer ${token}`)
+      .send({ article: updatePayload })
       .expect(200)
+
+    await createdArticle.refresh()
 
     assert.exists(article)
     assert.equal(article.title, createdArticle.title)
     assert.equal(article.description, createdArticle.description)
     assert.equal(article.body, createdArticle.body)
+    assert.deepEqual(article.tagList, tagList)
     assert.equal(article.author.username, createdArticle.author.username)
     assert.equal(article.author.bio, createdArticle.author.bio)
     assert.equal(article.author.image, createdArticle.author.image)
     assert.equal(article.author.following, false)
-    assert.equal(article.favorited, true)
-    assert.equal(article.favoritesCount, 1)
+    assert.equal(article.favorited, false)
+    assert.equal(article.favoritesCount, 0)
   })
 
   group.beforeEach(async () => {
