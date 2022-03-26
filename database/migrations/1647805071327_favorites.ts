@@ -6,7 +6,13 @@ export default class Favorites extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.unique(['article_id', 'user_id'])
-      table.integer('article_id').unsigned().references('id').inTable('articles').notNullable()
+      table
+        .integer('article_id')
+        .unsigned()
+        .references('id')
+        .inTable('articles')
+        .onDelete('CASCADE')
+        .notNullable()
       table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
 
       /**

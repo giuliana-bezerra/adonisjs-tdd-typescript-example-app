@@ -55,6 +55,17 @@ export default class ArticlesController {
     return response.ok({ article: await getArticle(articleUpdated, auth.user) })
   }
 
+  public async destroy({ request, response, bouncer }: HttpContextContract) {
+    const slug = request.param('slug')
+    const article = await Article.findByOrFail('slug', slug)
+
+    await bouncer.authorize('removeArticle', article)
+
+    await article.related('favorites').detach()
+    await article.delete()
+    return response.noContent()
+  }
+
   private async createTagsForArticle(article: Article, tagListPayload: string[] | undefined) {
     if (!!tagListPayload) {
       const tagList = tagListPayload.map((tag: string) => {

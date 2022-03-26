@@ -10,6 +10,8 @@ import User from 'App/Models/User'
 
 export const { actions } = Bouncer.define('updateArticle', (user: User, article: Article) => {
   return user.id === article.authorId
+}).define('removeArticle', (user: User, article: Article) => {
+  return user.id === article.authorId
 })
 
 /*
