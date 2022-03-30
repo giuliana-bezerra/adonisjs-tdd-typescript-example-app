@@ -47,11 +47,6 @@ test.group('Delete Article', (group) => {
       .expect(404)
   })
 
-  group.before(async () => {
-    const createdUser = await UserFactory.create()
-    user = await signIn(createdUser)
-  })
-
   test('it should not delete an article that belongs to another user', async () => {
     const createdArticle = await ArticleFactory.with('author')
       .with('tagList')
@@ -62,6 +57,11 @@ test.group('Delete Article', (group) => {
       .delete(`/api/articles/${createdArticle.slug}`)
       .set('Authorization', `Bearer ${user.token}`)
       .expect(403)
+  })
+
+  group.before(async () => {
+    const createdUser = await UserFactory.create()
+    user = await signIn(createdUser)
   })
 
   group.beforeEach(async () => {

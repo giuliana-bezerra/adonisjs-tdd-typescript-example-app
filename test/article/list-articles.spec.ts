@@ -207,15 +207,15 @@ test.group('List Articles', (group) => {
   })
 
   test('it should list articles with limit and offset', async (assert) => {
-    const createdArticles = await ArticleFactory.with('author').createMany(40)
-    const article = createdArticles[10]
+    const createdArticles = await ArticleFactory.with('author').createMany(3)
+    const article = createdArticles[1]
 
     const {
       body: { articles },
-    } = await supertest(BASE_URL).get('/api/articles?offset=10&limit=10').expect(200)
+    } = await supertest(BASE_URL).get('/api/articles?offset=1&limit=2').expect(200)
 
     assert.exists(articles)
-    assert.lengthOf(articles, 10)
+    assert.lengthOf(articles, 2)
     assert.equal(articles[0].title, article.title)
     assert.equal(articles[0].description, article.description)
     assert.equal(articles[0].body, article.body)

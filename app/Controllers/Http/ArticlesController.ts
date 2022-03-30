@@ -32,6 +32,24 @@ export default class ArticlesController {
     return response.ok({ articles: await getArticles(articles, auth.user) })
   }
 
+  public async feed({ request, response, auth }: HttpContextContract) {
+    const { limit, offset } = request.qs()
+    const user = auth.user!
+    user.related('followings')
+
+    const articles = await Article.query()
+      .whereHas('author', (query) => {
+        query.whereHas('followers', (query) => {
+          query.where('id', user.id)
+        })
+      })
+      .orderBy('updatedAt', 'desc')
+      .limit(limit || LIMIT)
+      .offset(offset || 0)
+
+    return response.ok({ articles: await getArticles(articles, auth.user) })
+  }
+
   public async store({ request, response, auth }: HttpContextContract) {
     const user = auth.user!
     const { article: articlePayload } = await request.validate(CreateArticleValidator)
