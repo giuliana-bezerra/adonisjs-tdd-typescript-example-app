@@ -1,7 +1,8 @@
 import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
-import { BaseModel, belongsTo, BelongsTo, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, belongsTo, BelongsTo, column, hasMany, HasMany, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import { DateTime } from 'luxon'
 
+import Comment from './Comment'
 import Tag from './Tag'
 import User from './User'
 
@@ -44,6 +45,9 @@ export default class Article extends BaseModel {
     pivotTable: 'favorites',
   })
   public favorites: ManyToMany<typeof User>
+
+  @hasMany(() => Comment)
+  public comments: HasMany<typeof Comment>
 
   @column.dateTime({ autoCreate: true, serializeAs: 'createdAt' })
   public createdAt: DateTime

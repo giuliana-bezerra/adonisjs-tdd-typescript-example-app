@@ -16,12 +16,13 @@ interface ArticleResponse {
 export const getArticles = async (articles: Article[], user: User | undefined) => {
   const mappedArticles = [] as ArticleResponse[]
   for (let i = 0; i < articles.length; i++) mappedArticles.push(await getArticle(articles[i], user))
-  return mappedArticles
+  return { articles: mappedArticles, articlesCount: mappedArticles.length }
 }
 
 export const getArticle = async (article: Article, user: User | undefined) => {
   await article.load('author')
   await article.load('tagList')
+
   await article.author.load('followers', (query) => {
     query.where('follower', user?.id || 0)
   })

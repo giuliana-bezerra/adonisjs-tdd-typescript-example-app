@@ -29,7 +29,8 @@ export default class ArticlesController {
       .orderBy('updatedAt', 'desc')
       .limit(limit || LIMIT)
       .offset(offset || 0)
-    return response.ok({ articles: await getArticles(articles, auth.user) })
+
+    return response.ok(await getArticles(articles, auth.user))
   }
 
   public async feed({ request, response, auth }: HttpContextContract) {
@@ -47,7 +48,7 @@ export default class ArticlesController {
       .limit(limit || LIMIT)
       .offset(offset || 0)
 
-    return response.ok({ articles: await getArticles(articles, auth.user) })
+    return response.ok(await getArticles(articles, auth.user))
   }
 
   public async store({ request, response, auth }: HttpContextContract) {

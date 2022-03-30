@@ -1,5 +1,6 @@
 import Factory from '@ioc:Adonis/Lucid/Factory'
 import Article from 'App/Models/Article'
+import Comment from 'App/Models/Comment'
 import Tag from 'App/Models/Tag'
 import User from 'App/Models/User'
 
@@ -25,6 +26,16 @@ export const ArticleFactory = Factory.define(Article, ({ faker }) => {
   .relation('tagList', () => TagsFactory)
   .relation('author', () => UserFactory)
   .relation('favorites', () => UserFactory)
+  .relation('comments', () => CommentFactory)
+  .build()
+
+export const CommentFactory = Factory.define(Comment, ({ faker }) => {
+  return {
+    body: faker.lorem.paragraph(),
+  }
+})
+  .relation('author', () => UserFactory)
+  .relation('article', () => ArticleFactory)
   .build()
 
 export const TagsFactory = Factory.define(Tag, ({ faker }) => {

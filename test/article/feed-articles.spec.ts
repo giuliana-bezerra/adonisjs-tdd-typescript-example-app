@@ -21,7 +21,7 @@ test.group('Feed Articles', (group) => {
       .create()
 
     const {
-      body: { articles },
+      body: { articles, articlesCount },
     } = await supertest(BASE_URL)
       .get('/api/articles/feed')
       .set('Authorization', `Bearer ${token}`)
@@ -32,6 +32,7 @@ test.group('Feed Articles', (group) => {
 
     assert.exists(articles)
     assert.lengthOf(articles, 1)
+    assert.equal(articlesCount, 1)
     assert.equal(article.title, createdArticle.title)
     assert.equal(article.description, createdArticle.description)
     assert.equal(article.body, createdArticle.body)
@@ -55,7 +56,7 @@ test.group('Feed Articles', (group) => {
       .create()
 
     const {
-      body: { articles },
+      body: { articles, articlesCount },
     } = await supertest(BASE_URL)
       .get('/api/articles/feed')
       .set('Authorization', `Bearer ${token}`)
@@ -63,6 +64,7 @@ test.group('Feed Articles', (group) => {
 
     assert.exists(articles)
     assert.lengthOf(articles, 0)
+    assert.equal(articlesCount, 0)
   })
 
   test('it should feed articles with limit and offset', async (assert) => {
@@ -78,7 +80,7 @@ test.group('Feed Articles', (group) => {
       .createMany(3)
 
     const {
-      body: { articles },
+      body: { articles, articlesCount },
     } = await supertest(BASE_URL)
       .get('/api/articles/feed?offset=1,limit=2')
       .set('Authorization', `Bearer ${token}`)
@@ -90,6 +92,7 @@ test.group('Feed Articles', (group) => {
 
     assert.exists(articles)
     assert.lengthOf(articles, 2)
+    assert.equal(articlesCount, 2)
     assert.equal(article.title, createdArticle.title)
     assert.equal(article.description, createdArticle.description)
     assert.equal(article.body, createdArticle.body)
