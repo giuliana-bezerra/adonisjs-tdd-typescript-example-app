@@ -49,7 +49,7 @@ test.group('Comments', (group) => {
     }
 
     await supertest(BASE_URL)
-      .post(`/api/articles/slug/comments`)
+      .post('/api/articles/slug/comments')
       .send(commentPayload)
       .set('Authorization', `Bearer ${user.token}`)
       .expect(404)
@@ -61,10 +61,78 @@ test.group('Comments', (group) => {
     }
 
     await supertest(BASE_URL)
-      .post(`/api/articles/slug/comments`)
+      .post('/api/articles/slug/comments')
       .send(commentPayload)
       .set('Authorization', `Bearer ${user.token}`)
       .expect(422)
+  })
+
+  test('it should get comments from an article', async (assert) => {
+    const createdArticle = await ArticleFactory.with('author')
+      .with('comments', 1, (factory) => factory.with('author'))
+      .create()
+    const createdComment = createdArticle.comments[0]
+
+    const {
+      body: { comments },
+    } = await supertest(BASE_URL).get(`/api/articles/${createdArticle.slug}/comments`).expect(200)
+
+    const comment = comments[0]
+
+    assert.lengthOf(comments, 1)
+    assert.equal(comment.id, 1)
+    assert.equal(comment.body, createdComment.body)
+    assert.equal(comment.author.username, createdComment.author.username)
+    assert.equal(comment.author.bio, createdComment.author.bio)
+    assert.equal(comment.author.image, createdComment.author.image)
+    assert.equal(comment.author.following, false)
+  })
+
+  test('it should get no comments from an unexisting article', async () => {
+    await supertest(BASE_URL).get('/api/articles/slug/comments').expect(404)
+  })
+
+  test('it should get no comments from article', async (assert) => {
+    const { slug } = await ArticleFactory.with('author').create()
+
+    const {
+      body: { comments },
+    } = await supertest(BASE_URL).get(`/api/articles/${slug}/comments`).expect(200)
+
+    assert.lengthOf(comments, 0)
+  })
+
+  test('it should get comments from an article with a followed author', async (assert) => {
+    const author = await UserFactory.with('followers').create()
+
+    const createdArticle = await ArticleFactory.with('author')
+      .with('comments', 1, (factory) =>
+        factory.with('author', 1, (factory) => {
+          factory.merge(author)
+        })
+      )
+      .create()
+
+    const createdComment = createdArticle.comments[0]
+    const follower = author.followers[0]
+    const { token } = await signIn(follower)
+
+    const {
+      body: { comments },
+    } = await supertest(BASE_URL)
+      .get(`/api/articles/${createdArticle.slug}/comments`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+
+    const comment = comments[0]
+
+    assert.lengthOf(comments, 1)
+    assert.equal(comment.id, 1)
+    assert.equal(comment.body, createdComment.body)
+    assert.equal(comment.author.username, createdComment.author.username)
+    assert.equal(comment.author.bio, createdComment.author.bio)
+    assert.equal(comment.author.image, createdComment.author.image)
+    assert.equal(comment.author.following, true)
   })
 
   group.before(async () => {

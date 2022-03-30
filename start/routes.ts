@@ -44,6 +44,7 @@ Route.group(() => {
   Route.post('/articles/:slug/favorite', 'FavoritesController.favorite').middleware('auth')
   Route.delete('/articles/:slug/favorite', 'FavoritesController.unfavorite').middleware('auth')
 
+  Route.get('/articles/:slug/comments', 'CommentsController.index').middleware('silentAuth')
   Route.post('/articles/:slug/comments', 'CommentsController.store').middleware('auth')
 
   Route.get('/tags', 'TagsController.index')
