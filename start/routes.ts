@@ -46,6 +46,7 @@ Route.group(() => {
 
   Route.get('/articles/:slug/comments', 'CommentsController.index').middleware('silentAuth')
   Route.post('/articles/:slug/comments', 'CommentsController.store').middleware('auth')
+  Route.delete('/articles/:slug/comments/:id', 'CommentsController.destroy').middleware('auth')
 
   Route.get('/tags', 'TagsController.index')
 }).prefix('/api')

@@ -1,4 +1,5 @@
 import Database from '@ioc:Adonis/Lucid/Database'
+import Comment from 'App/Models/Comment'
 import { ArticleFactory, UserFactory } from 'Database/factories'
 import test from 'japa'
 import supertest from 'supertest'
@@ -133,6 +134,51 @@ test.group('Comments', (group) => {
     assert.equal(comment.author.bio, createdComment.author.bio)
     assert.equal(comment.author.image, createdComment.author.image)
     assert.equal(comment.author.following, true)
+  })
+
+  test('it should delete a comment from an article', async (assert) => {
+    const article = await ArticleFactory.with('author')
+      .with('comments', 1, (factory) => factory.with('author'))
+      .create()
+    const comment = article.comments[0]
+    const { token } = await signIn(comment.author)
+
+    await supertest(BASE_URL)
+      .delete(`/api/articles/${article.slug}/comments/${comment.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(204)
+
+    const deletedComment = await Comment.find(comment.id)
+    assert.notExists(deletedComment)
+  })
+
+  test('it should not delete a comment from an unexisting article', async () => {
+    await supertest(BASE_URL)
+      .delete('/api/articles/slug/comments/1')
+      .set('Authorization', `Bearer ${user.token}`)
+      .expect(404)
+  })
+
+  test('it should not delete an unexisting comment from an article', async () => {
+    const article = await ArticleFactory.with('author').create()
+
+    await supertest(BASE_URL)
+      .delete(`/api/articles/${article.slug}/comments/1`)
+      .set('Authorization', `Bearer ${user.token}`)
+      .expect(404)
+  })
+
+  test('it should delete a comment from another user', async () => {
+    const article = await ArticleFactory.with('author')
+      .with('comments', 1, (factory) => factory.with('author'))
+      .create()
+
+    const comment = article.comments[0]
+
+    await supertest(BASE_URL)
+      .delete(`/api/articles/${article.slug}/comments/${comment.id}`)
+      .set('Authorization', `Bearer ${user.token}`)
+      .expect(403)
   })
 
   group.before(async () => {

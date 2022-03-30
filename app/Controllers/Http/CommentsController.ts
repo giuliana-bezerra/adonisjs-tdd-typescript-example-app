@@ -1,6 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Article from 'App/Models/Article'
-import Comment from 'App/Models/Comment'
 import CreateCommentValidator from 'App/Validators/CreateCommentValidator'
 
 import { getComment, getComments } from '../Mappers/CommentMapper'
@@ -27,5 +26,18 @@ export default class CommentsController {
       .create({ ...commentPayload, authorId: user.id })
 
     return response.created({ comment: await getComment(comment, user) })
+  }
+
+  public async destroy({ request, response, bouncer }: HttpContextContract) {
+    const slug = request.param('slug')
+    const commentId = request.param('id')
+
+    const article = await Article.findByOrFail('slug', slug)
+    const comment = await article.related('comments').query().where('id', commentId).firstOrFail()
+
+    await bouncer.authorize('removeComment', comment)
+
+    await comment.delete()
+    return response.noContent()
   }
 }
