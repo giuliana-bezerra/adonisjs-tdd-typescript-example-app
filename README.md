@@ -6,9 +6,9 @@
 
 This codebase was created to demonstrate a fully fledged fullstack application built with **AdonisJS 5** including CRUD operations, authentication, routing, pagination, and more.
 
-We've gone to great lengths to adhere to the **AdonisJS 5** community styleguides & best practices.
+I've gone to great lengths to adhere to the **AdonisJS 5** community styleguides & best practices.
 
-For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repo.
+For more information about the API built here, head over to the [API Specs](https://realworld-docs.netlify.app/docs/specs/backend-specs/introduction) repo.
 
 # Getting started
 
