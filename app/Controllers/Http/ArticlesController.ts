@@ -7,6 +7,7 @@ import UpdateArticleValidator from 'App/Validators/UpdateArticleValidator'
 import { getArticle, getArticles } from '../Mappers/ArticleMapper'
 
 const LIMIT = 20
+
 export default class ArticlesController {
   public async show({ request, response, auth }: HttpContextContract) {
     const slug = request.param('slug')
