@@ -41,4 +41,4 @@ $ yarn test
 $ yarn dev
 ```
 
-For other commands, follow [AdonisJS documentation](https://adonisjs.com)
+For other commands, follow [AdonisJS documentation](https://adonisjs.com).
