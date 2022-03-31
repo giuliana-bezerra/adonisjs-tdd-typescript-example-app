@@ -6,7 +6,7 @@ This codebase was created to demonstrate a fully fledged fullstack application b
 
 I've gone to great lengths to adhere to the **AdonisJS 5** community styleguides & best practices.
 
-For more information about the API built here, head over to the [API Specs](https://realworld-docs.netlify.app/docs/specs/backend-specs/introduction) repo.
+For more information about the API built here, head over to the [API Specs](https://realworld-docs.netlify.app/docs/specs/backend-specs/introduction).
 
 # Getting started
 
